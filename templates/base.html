@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('users') }}">User List</a>
+        <a href="{{ url_for('add_user') }}">Add User</a>
+    </nav>
+    {% block content %}{% endblock %}
+</body>
+</html>
