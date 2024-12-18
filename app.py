@@ -278,4 +278,5 @@ def add_double_match():
     return render_template('add_double_match.html', pairs=pairs)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=False)
