@@ -1,119 +1,209 @@
 /* Base Styles */
 :root {
-    --primary: #2196F3;
-    --text: #333;
-    --bg: #f5f5f5;
-    --border: #ddd;
-    --danger: #f44336;
+    --primary-color: #007AFF;  /* iOS 蓝色 */
+    --success-color: #34C759;  /* iOS 绿色 */
+    --danger-color: #FF3B30;   /* iOS 红色 */
+    --background-color: #F2F2F7; /* iOS 浅灰背景 */
+    --card-background: #FFFFFF;
+    --text-color: #000000;
+    --text-secondary: #8E8E93;
 }
 
-* {
+/* 基础样式 */
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--background-color);
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.6;
-    color: var(--text);
-    background: var(--bg);
-}
-
-/* Layout */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
-}
-
-/* Navigation */
+/* 导航栏样式 */
 .navbar {
-    background: var(--primary);
-    padding: 1rem;
+    background: var(--card-background);
+    padding: env(safe-area-inset-top) 0 10px 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.1);
 }
 
 .nav-brand {
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 500;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    padding: 10px;
 }
 
 .nav-links {
-    margin-top: 1rem;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 15px;
 }
 
 .nav-item {
-    color: white;
+    color: var(--primary-color);
     text-decoration: none;
-    padding: 0.5rem;
-    display: inline-block;
+    padding: 8px 12px;
+    white-space: nowrap;
+    font-size: 15px;
 }
 
-/* Forms */
+/* 主容器 */
+.container {
+    padding: 120px 15px 80px;
+    max-width: 100%;
+}
+
+/* 表格样式 */
+.table-container {
+    background: var(--card-background);
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--card-background);
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+td {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    font-size: 15px;
+}
+
+/* 按钮样式 */
+.btn-add {
+    background: var(--primary-color);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* 开关样式 */
+.toggle {
+    position: relative;
+    display: inline-block;
+    width: 51px;
+    height: 31px;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #E9E9EA;
+    transition: .4s;
+    border-radius: 31px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 27px;
+    width: 27px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle input:checked + .toggle-slider {
+    background-color: var(--success-color);
+}
+
+.toggle input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+/* 表单样式 */
 .form-container {
-    background: white;
-    padding: 1rem;
-    border-radius: 4px;
-    max-width: 500px;
-    margin: 1rem auto;
+    background: var(--card-background);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
 }
 
 .form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 20px;
 }
 
 .form-input {
     width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    padding: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    font-size: 16px;
+    -webkit-appearance: none;
 }
 
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
+select.form-input {
     background: white;
-    margin: 1rem 0;
 }
 
-th, td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
+/* 胜负记录样式 */
+.win-count {
+    color: var(--success-color);
+    font-weight: 500;
 }
 
-/* Buttons */
-.btn-submit, .btn-add {
-    background: var(--primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
+.loss-count {
+    color: var(--danger-color);
+    font-weight: 500;
 }
 
-/* Alerts */
-.alert {
-    padding: 0.75rem;
-    margin: 1rem 0;
-    color: var(--danger);
-    background: #fee;
-    border-radius: 4px;
+/* 页眉样式 */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-/* Empty States */
+.header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* 空状态样式 */
 .empty-state {
     text-align: center;
-    padding: 2rem;
+    padding: 40px 20px;
+    background: var(--card-background);
+    border-radius: 10px;
 }
 
 .empty-state-content {
@@ -121,67 +211,88 @@ th, td {
     margin: 0 auto;
 }
 
-/* Header */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 1rem 0;
+.empty-icon {
+    font-size: 48px;
+    color: var(--text-secondary);
 }
 
-/* Responsive */
-@media (min-width: 768px) {
-    .navbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
+/* 警告消息样式 */
+.alert {
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--danger-color);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
 
-    .nav-links {
-        margin-top: 0;
-    }
+/* 底部导航 */
+.footer {
+    background: var(--card-background);
+    padding: 20px 0 env(safe-area-inset-bottom);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    box-shadow: 0 -1px 0 rgba(0,0,0,0.1);
+}
 
-    .nav-group {
-        display: inline-block;
-        margin-left: 1rem;
-    }
+/* 非活跃玩家样式 */
+.inactive-player {
+    opacity: 0.5;
+}
 
+/* iOS 特定优化 */
+@supports (-webkit-touch-callout: none) {
+    /* 防止双击缩放 */
+    * {
+        touch-action: manipulation;
+    }
+    
+    /* 更好的点击反馈 */
+    .btn-add:active,
+    .nav-item:active {
+        opacity: 0.7;
+    }
+    
+    /* 更好的滚动体验 */
     .table-container {
-        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 适配刘海屏 */
+    .navbar {
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    .footer {
+        padding-bottom: env(safe-area-inset-bottom);
     }
 }
 
-/* Utilities */
-.material-icons {
-    vertical-align: middle;
-    font-size: 1.1em;
-}
-
-.required {
-    color: var(--danger);
-}
-
-/* Admin Styles */
-.admin-section {
-    background: white;
-    padding: 1rem;
-    margin: 1rem 0;
-    border-radius: 4px;
-}
-
-.admin-section h2 {
-    margin-bottom: 1rem;
-}
-
-.btn-delete {
-    background: var(--danger);
-    color: white;
-    border: none;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-delete:hover {
-    background: #d32f2f;
+/* 媒体查询优化 */
+@media (max-width: 428px) { /* iPhone 12 Pro Max 宽度 */
+    .container {
+        padding: 100px 10px 70px;
+    }
+    
+    .table-container {
+        margin: 8px -10px;
+        border-radius: 0;
+    }
+    
+    .form-container {
+        margin: 8px -10px;
+        border-radius: 0;
+    }
+    
+    th, td {
+        padding: 10px;
+    }
+    
+    .header h1 {
+        font-size: 20px;
+    }
 }
