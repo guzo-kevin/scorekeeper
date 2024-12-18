@@ -306,24 +306,50 @@ def admin():
 def delete_player(id):
     try:
         player = Player.query.get_or_404(id)
+        
+        # Check if player is in any pairs
+        pairs_count = Pair.query.filter(
+            (Pair.player1_id == id) | 
+            (Pair.player2_id == id)
+        ).count()
+        
+        if pairs_count > 0:
+            flash('Cannot delete player: Player is part of existing pairs. Please delete the pairs first.')
+            return redirect(url_for('admin'))
+        
         db.session.delete(player)
         db.session.commit()
         flash('Player deleted successfully')
+        
     except Exception as e:
         db.session.rollback()
-        flash('Error deleting player: Player might be referenced in pairs or matches')
+        flash(f'Error deleting player: {str(e)}')
+        
     return redirect(url_for('admin'))
 
 @app.route('/delete/pair/<int:id>', methods=['POST'])
 def delete_pair(id):
     try:
         pair = Pair.query.get_or_404(id)
+        
+        # Check if pair is involved in any matches
+        matches_count = DoubleMatch.query.filter(
+            (DoubleMatch.team1_pair_id == id) |
+            (DoubleMatch.team2_pair_id == id)
+        ).count()
+        
+        if matches_count > 0:
+            flash('Cannot delete pair: Pair has played matches. Please delete the matches first.')
+            return redirect(url_for('admin'))
+        
         db.session.delete(pair)
         db.session.commit()
         flash('Pair deleted successfully')
+        
     except Exception as e:
         db.session.rollback()
-        flash('Error deleting pair: Pair might be referenced in matches')
+        flash(f'Error deleting pair: {str(e)}')
+        
     return redirect(url_for('admin'))
 
 @app.route('/delete/double_match/<int:id>', methods=['POST'])
