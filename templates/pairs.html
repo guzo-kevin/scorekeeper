@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+    <h1>Doubles Pairs</h1>
+    <a href="{{ url_for('add_pair') }}" class="btn-add">
+        <span class="material-icons">add</span>
+        New Pair
+    </a>
+</div>
+
+<div class="pairs-list">
+    {% for pair in pairs %}
+    <div class="pair-card">
+        <div class="pair-info">
+            <h3>{{ pair.player1.name }} / {{ pair.player2.name }}</h3>
+            <div class="pair-details">
+                <span>Created: {{ pair.created_date.strftime('%Y-%m-%d') }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 

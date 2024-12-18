@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+    <h1>Badminton Players</h1>
+    <a href="{{ url_for('add_player') }}" class="btn-add">
+        <span class="material-icons">person_add</span>
+        New Player
+    </a>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="players-list">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Sex</th>
+                <th>Join Date</th>
+                <th>Pairs</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+            <tr>
+                <td>{{ player.id }}</td>
+                <td>{{ player.name }}</td>
+                <td>
+                    {% if player.sex.value == 'M' %}♂️
+                    {% elif player.sex.value == 'F' %}♀️
+                    {% else %}?
+                    {% endif %}
+                    {{ player.sex.value }}
+                </td>
+                <td>{{ player.join_date.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    <a href="{{ url_for('add_pair') }}" class="btn-small">
+                        <span class="material-icons">group_add</span>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

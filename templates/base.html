@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Management System</title>
+    <title>Player Management System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <nav>
-        <a href="{{ url_for('users') }}">User List</a>
-        <a href="{{ url_for('add_user') }}">Add User</a>
+    <nav class="navbar">
+        <div class="nav-brand">🎮 Player Hub</div>
+        <div class="nav-links">
+            <a href="{{ url_for('players') }}" class="nav-item">
+                <span class="material-icons">groups</span>
+                Players
+            </a>
+            <a href="{{ url_for('add_player') }}" class="nav-item">
+                <span class="material-icons">person_add</span>
+                Add Player
+            </a>
+        </div>
     </nav>
-    {% block content %}{% endblock %}
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
 </body>
 </html>
