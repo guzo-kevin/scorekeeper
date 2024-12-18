@@ -21,10 +21,8 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Player 1</th>
                     <th>Player 2</th>
-                    <th>Created Date</th>
                     <th>Matches</th>
                     <th>Win/Loss</th>
                     <th>Win Rate</th>
@@ -33,10 +31,8 @@
             <tbody>
                 {% for pair in pairs %}
                 <tr>
-                    <td>{{ pair.id }}</td>
                     <td>{{ pair.player1.name }}</td>
                     <td>{{ pair.player2.name }}</td>
-                    <td>{{ pair.created_date.strftime('%Y-%m-%d') }}</td>
                     <td>{{ pair.total_matches }}</td>
                     <td>
                         <span class="win-count">{{ pair.wins }}</span> / 
