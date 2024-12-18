@@ -25,7 +25,9 @@
                     <th>Name</th>
                     <th>Sex</th>
                     <th>Join Date</th>
-                    <th>Pairs</th>
+                    <th>Matches</th>
+                    <th>Win/Loss</th>
+                    <th>Win Rate</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,13 +40,19 @@
                         {% elif player.sex.value == 'F' %}♀️
                         {% else %}?
                         {% endif %}
-                        {{ player.sex.value }}
                     </td>
                     <td>{{ player.join_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ player.total_matches }}</td>
                     <td>
-                        {# <a href="{{ url_for('add_pair') }}" class="btn-small">
-                            <span class="material-icons">group_add</span>
-                        </a> #}
+                        <span class="win-count">{{ player.wins }}</span> / 
+                        <span class="loss-count">{{ player.losses }}</span>
+                    </td>
+                    <td>
+                        {% if player.total_matches > 0 %}
+                            {{ "%.1f"|format(player.win_rate) }}%
+                        {% else %}
+                            -
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

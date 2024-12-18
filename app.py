@@ -140,6 +140,34 @@ def add_pair():
 def players():
     try:
         players = Player.query.order_by(Player.name).all()
+        
+        # Calculate win/loss records for each player
+        for player in players:
+            # Find all pairs containing this player
+            player_pairs = Pair.query.filter(
+                (Pair.player1_id == player.id) | 
+                (Pair.player2_id == player.id)
+            ).all()
+            
+            pair_ids = [pair.id for pair in player_pairs]
+            
+            # Find all matches involving these pairs
+            wins = DoubleMatch.query.filter(
+                DoubleMatch.winner_pair_id.in_(pair_ids)
+            ).count()
+            
+            # Total matches is matches where player's pairs were team1 or team2
+            total_matches = DoubleMatch.query.filter(
+                (DoubleMatch.team1_pair_id.in_(pair_ids)) |
+                (DoubleMatch.team2_pair_id.in_(pair_ids))
+            ).count()
+            
+            # Calculate statistics
+            player.wins = wins
+            player.losses = total_matches - wins
+            player.total_matches = total_matches
+            player.win_rate = (wins / total_matches * 100) if total_matches > 0 else 0
+            
         return render_template('players.html', players=players)
     except Exception as e:
         flash(f"Error loading players: {str(e)}")
