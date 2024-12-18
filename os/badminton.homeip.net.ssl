@@ -1,0 +1,11 @@
+server {
+    listen 443 ssl;
+    server_name badminton.homeip.net;
+
+    # SSL certificate paths (dummy/self-signed or valid certificates required)
+    ssl_certificate /etc/nginx/ssl/example.com.crt;
+    ssl_certificate_key /etc/nginx/ssl/example.com.key;
+
+    # Redirect all HTTPS requests to HTTP
+    return 301 http://badminton.homeip.net;
+}
