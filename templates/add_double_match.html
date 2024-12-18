@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="form-container">
-    <h1>Record New Double Match</h1>
+    <h1>Record New Match</h1>
     
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -11,83 +11,83 @@
         {% endif %}
     {% endwith %}
     
-    <form method="POST" class="match-form">
-        <div class="team-section">
-            <h2>Team 1</h2>
-            <div class="form-group">
-                <label>Select Pair *</label>
-                <select name="team1_pair" required class="form-input">
-                    <option value="">Select pair</option>
-                    {% for pair in pairs %}
-                    <option value="{{ pair.id }}">
-                        {{ pair.player1.name }} / {{ pair.player2.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Score *</label>
-                <input 
-                    type="number" 
-                    name="team1_score" 
-                    required 
-                    min="0" 
-                    class="form-input"
-                    placeholder="Enter team 1 score"
-                >
+    {% if pairs|length < 2 %}
+        <div class="empty-state">
+            <div class="empty-state-content">
+                <span class="material-icons empty-icon">groups</span>
+                <h2>Not Enough Active Pairs</h2>
+                <p>You need at least two different pairs with active players to record a match.</p>
+                <a href="{{ url_for('add_pair') }}" class="btn-submit">
+                    <span class="material-icons">group_add</span>
+                    Create New Pair
+                </a>
             </div>
         </div>
-
-        <div class="team-section">
-            <h2>Team 2</h2>
-            <div class="form-group">
-                <label>Select Pair *</label>
-                <select name="team2_pair" required class="form-input">
-                    <option value="">Select pair</option>
-                    {% for pair in pairs %}
-                    <option value="{{ pair.id }}">
-                        {{ pair.player1.name }} / {{ pair.player2.name }}
-                    </option>
-                    {% endfor %}
-                </select>
+    {% else %}
+        <form method="POST" class="match-form">
+            <div class="team-section">
+                <h2>Team 1</h2>
+                <div class="form-group">
+                    <label>Select Pair *</label>
+                    <select name="team1_pair" required class="form-input">
+                        <option value="">Select pair</option>
+                        {% for pair in pairs %}
+                        <option value="{{ pair.id }}">
+                            {{ pair.player1.name }} / {{ pair.player2.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Score *</label>
+                    <input 
+                        type="number" 
+                        name="team1_score" 
+                        required 
+                        min="0" 
+                        class="form-input"
+                        placeholder="Enter team 1 score"
+                    >
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label>Score *</label>
-                <input 
-                    type="number" 
-                    name="team2_score" 
-                    required 
-                    min="0" 
-                    class="form-input"
-                    placeholder="Enter team 2 score"
-                >
+
+            <div class="team-section">
+                <h2>Team 2</h2>
+                <div class="form-group">
+                    <label>Select Pair *</label>
+                    <select name="team2_pair" required class="form-input">
+                        <option value="">Select pair</option>
+                        {% for pair in pairs %}
+                        <option value="{{ pair.id }}">
+                            {{ pair.player1.name }} / {{ pair.player2.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Score *</label>
+                    <input 
+                        type="number" 
+                        name="team2_score" 
+                        required 
+                        min="0" 
+                        class="form-input"
+                        placeholder="Enter team 2 score"
+                    >
+                </div>
             </div>
-        </div>
 
-        <div class="form-note">
-            <span class="required">*</span> Required fields
-        </div>
+            <div class="form-note">
+                <span class="required">*</span> Required fields
+            </div>
 
-        <button type="submit" class="btn-submit">
-            <span class="material-icons">save</span>
-            Record Match
-        </button>
-    </form>
+            <button type="submit" class="btn-submit">
+                <span class="material-icons">save</span>
+                Record Match
+            </button>
+        </form>
+    {% endif %}
 </div>
-
-{% if not pairs or pairs|length < 2 %}
-<div class="empty-state">
-    <div class="empty-state-content">
-        <span class="material-icons empty-icon">groups</span>
-        <h2>Not Enough Pairs</h2>
-        <p>You need at least two different pairs to record a doubles match.</p>
-        <a href="{{ url_for('add_pair') }}" class="btn-submit">
-            <span class="material-icons">group_add</span>
-            Create New Pair
-        </a>
-    </div>
-</div>
-{% endif %}
 {% endblock %} 

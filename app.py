@@ -4,6 +4,7 @@ from datetime import datetime
 from enum import Enum
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_
+from sqlalchemy.orm import aliased
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///badminton.db'
@@ -253,8 +254,21 @@ def add_double_match():
             db.session.rollback()
             flash('Error recording match!')
             
-    pairs = Pair.query.all()
-    return render_template('add_double_match.html', pairs=pairs)
+    # Get pairs where both players are active using explicit aliases
+    Player1 = aliased(Player)
+    Player2 = aliased(Player)
+    
+    active_pairs = db.session.query(Pair)\
+        .join(Player1, Pair.player1_id == Player1.id)\
+        .join(Player2, Pair.player2_id == Player2.id)\
+        .filter(
+            db.and_(
+                Player1.is_active == True,
+                Player2.is_active == True
+            )
+        ).all()
+    
+    return render_template('add_double_match.html', pairs=active_pairs)
 
 @app.route('/admin')
 def admin():
