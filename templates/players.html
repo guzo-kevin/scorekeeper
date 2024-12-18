@@ -21,9 +21,8 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
-                    <th>Sex</th>
+                    <th>Active</th>
                     <th>Join Date</th>
                     <th>Matches</th>
                     <th>Win/Loss</th>
@@ -32,14 +31,16 @@
             </thead>
             <tbody>
                 {% for player in players %}
-                <tr>
-                    <td>{{ player.id }}</td>
+                <tr class="{% if not player.is_active %}inactive-player{% endif %}">
                     <td>{{ player.name }}</td>
                     <td>
-                        {% if player.sex.value == 'M' %}♂️
-                        {% elif player.sex.value == 'F' %}♀️
-                        {% else %}?
-                        {% endif %}
+                        <label class="toggle">
+                            <input type="checkbox" 
+                                   {% if player.is_active %}checked{% endif %}
+                                   data-player-id="{{ player.id }}"
+                                   class="status-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </td>
                     <td>{{ player.join_date.strftime('%Y-%m-%d') }}</td>
                     <td>{{ player.total_matches }}</td>
@@ -59,6 +60,38 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+    document.querySelectorAll('.status-toggle').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const playerId = this.dataset.playerId;
+            fetch(`/toggle_player_status/${playerId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const row = this.closest('tr');
+                    if (!data.is_active) {
+                        row.classList.add('inactive-player');
+                    } else {
+                        row.classList.remove('inactive-player');
+                    }
+                } else {
+                    alert('Error updating status');
+                    this.checked = !this.checked;
+                }
+            })
+            .catch(error => {
+                alert('Error updating status');
+                this.checked = !this.checked;
+            });
+        });
+    });
+    </script>
 {% else %}
     <div class="empty-state">
         <div class="empty-state-content">

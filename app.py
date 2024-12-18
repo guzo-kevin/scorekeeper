@@ -20,6 +20,7 @@ class Player(db.Model):
     name = db.Column(db.String(80), nullable=False, unique=True)
     sex = db.Column(db.Enum(Sex), nullable=False, default=Sex.U)
     join_date = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
 
 class Pair(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -132,7 +133,13 @@ def pairs():
             pair.wins = wins
             pair.losses = total_matches - wins
             pair.total_matches = total_matches
-            pair.win_rate = (wins / total_matches * 100) if total_matches > 0 else 0
+            pair.win_rate = (wins / total_matches * 100) if total_matches > 0 else -1
+        
+        # Sort pairs by win rate (descending) and total matches (descending)
+        pairs = sorted(pairs, 
+                      key=lambda x: (x.win_rate if x.win_rate >= 0 else float('-inf'),
+                                   -x.total_matches),
+                      reverse=True)
             
         return render_template('pairs.html', pairs=pairs)
     except Exception as e:
@@ -163,11 +170,10 @@ def add_pair():
 @app.route('/players')
 def players():
     try:
-        players = Player.query.order_by(Player.name).all()
+        players = Player.query.all()
         
         # Calculate win/loss records for each player
         for player in players:
-            # Find all pairs containing this player
             player_pairs = Pair.query.filter(
                 (Pair.player1_id == player.id) | 
                 (Pair.player2_id == player.id)
@@ -175,22 +181,25 @@ def players():
             
             pair_ids = [pair.id for pair in player_pairs]
             
-            # Find all matches involving these pairs
             wins = DoubleMatch.query.filter(
                 DoubleMatch.winner_pair_id.in_(pair_ids)
             ).count()
             
-            # Total matches is matches where player's pairs were team1 or team2
             total_matches = DoubleMatch.query.filter(
                 (DoubleMatch.team1_pair_id.in_(pair_ids)) |
                 (DoubleMatch.team2_pair_id.in_(pair_ids))
             ).count()
             
-            # Calculate statistics
             player.wins = wins
             player.losses = total_matches - wins
             player.total_matches = total_matches
-            player.win_rate = (wins / total_matches * 100) if total_matches > 0 else 0
+            player.win_rate = (wins / total_matches * 100) if total_matches > 0 else -1
+        
+        # Sort players by win rate (descending)
+        players = sorted(players, 
+                        key=lambda x: (x.win_rate if x.win_rate >= 0 else float('-inf'), 
+                                     -x.total_matches),
+                        reverse=True)
             
         return render_template('players.html', players=players)
     except Exception as e:
@@ -292,6 +301,17 @@ def delete_double_match(id):
         db.session.rollback()
         flash('Error deleting match')
     return redirect(url_for('admin'))
+
+@app.route('/toggle_player_status/<int:id>', methods=['POST'])
+def toggle_player_status(id):
+    try:
+        player = Player.query.get_or_404(id)
+        player.is_active = not player.is_active
+        db.session.commit()
+        return {'status': 'success', 'is_active': player.is_active}
+    except Exception as e:
+        db.session.rollback()
+        return {'status': 'error', 'message': str(e)}, 400
 
 if __name__ == '__main__':
     # app.run(debug=True)
