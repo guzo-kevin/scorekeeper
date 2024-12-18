@@ -259,11 +259,25 @@ def add_double_match():
             team1_score = int(request.form['team1_score'])
             team2_score = int(request.form['team2_score'])
             
-            new_match = DoubleMatch.create_match(
-                team1_pair_id,
-                team2_pair_id,
-                team1_score,
-                team2_score
+            # Validate different pairs
+            if team1_pair_id == team2_pair_id:
+                flash('Cannot record a match between the same pair')
+                return redirect(url_for('add_double_match'))
+            
+            # Validate scores cannot be equal
+            if team1_score == team2_score:
+                flash('Scores cannot be equal - there must be a winner')
+                return redirect(url_for('add_double_match'))
+            
+            # Create the match with the winner determined by scores
+            winner_pair_id = team1_pair_id if team1_score > team2_score else team2_pair_id
+            
+            new_match = DoubleMatch(
+                team1_pair_id=team1_pair_id,
+                team2_pair_id=team2_pair_id,
+                team1_score=team1_score,
+                team2_score=team2_score,
+                winner_pair_id=winner_pair_id
             )
             
             db.session.add(new_match)
@@ -271,11 +285,11 @@ def add_double_match():
             return redirect(url_for('double_matches'))
             
         except ValueError as e:
-            flash(str(e))
+            flash('Invalid input: Please check your scores')
         except Exception as e:
             db.session.rollback()
             flash('Error recording match!')
-            
+    
     # Get pairs where both players are active using explicit aliases
     Player1 = aliased(Player)
     Player2 = aliased(Player)

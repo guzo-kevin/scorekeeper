@@ -24,7 +24,7 @@
             </div>
         </div>
     {% else %}
-        <form method="POST" class="match-form">
+        <form method="POST" class="match-form" onsubmit="return validateScores()">
             <div class="team-section">
                 <h2>Team 1</h2>
                 <div class="form-group">
@@ -52,36 +52,36 @@
                 </div>
             </div>
 
-            <div class="team-section">
-                <h2>Team 2</h2>
-                <div class="form-group">
-                    <label>Select Pair *</label>
-                    <select name="team2_pair" required class="form-input">
-                        <option value="">Select pair</option>
-                        {% for pair in pairs %}
-                        <option value="{{ pair.id }}">
-                            {{ pair.player1.name }} / {{ pair.player2.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Score *</label>
-                    <input 
-                        type="number" 
-                        name="team2_score" 
-                        required 
-                        min="0" 
-                        class="form-input"
-                        placeholder="Enter team 2 score"
-                    >
-                </div>
+        <div class="team-section">
+            <h2>Team 2</h2>
+            <div class="form-group">
+                <label>Select Pair *</label>
+                <select name="team2_pair" required class="form-input">
+                    <option value="">Select pair</option>
+                    {% for pair in pairs %}
+                    <option value="{{ pair.id }}">
+                        {{ pair.player1.name }} / {{ pair.player2.name }}
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
+            
+            <div class="form-group">
+                <label>Score *</label>
+                <input 
+                    type="number" 
+                    name="team2_score" 
+                    required 
+                    min="0" 
+                    class="form-input"
+                    placeholder="Enter team 2 score"
+                >
+            </div>
+        </div>
 
-            <div class="form-note">
-                <span class="required">*</span> Required fields
-            </div>
+        <div class="form-note">
+            <span class="required">*</span> Required fields
+        </div>
 
             <button type="submit" class="btn-submit">
                 <span class="material-icons">save</span>
@@ -90,4 +90,17 @@
         </form>
     {% endif %}
 </div>
+
+<script>
+function validateScores() {
+    const team1Score = parseInt(document.querySelector('input[name="team1_score"]').value);
+    const team2Score = parseInt(document.querySelector('input[name="team2_score"]').value);
+    
+    if (team1Score === team2Score) {
+        alert('Scores cannot be equal - there must be a winner');
+        return false;
+    }
+    return true;
+}
+</script>
 {% endblock %} 
