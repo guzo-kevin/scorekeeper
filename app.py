@@ -65,49 +65,6 @@ class Pair(db.Model):
             
         return Pair(player1_id=player1_id, player2_id=player2_id)
 
-class SingleMatch(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    player1_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
-    player2_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
-    player1_score = db.Column(db.Integer, nullable=False)
-    player2_score = db.Column(db.Integer, nullable=False)
-    winner_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
-    match_date = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Define relationships
-    player1 = db.relationship('Player', foreign_keys=[player1_id])
-    player2 = db.relationship('Player', foreign_keys=[player2_id])
-    winner = db.relationship('Player', foreign_keys=[winner_id])
-
-    @staticmethod
-    def create_match(player1_id, player2_id, player1_score, player2_score):
-        # Verify players exist
-        player1 = Player.query.get(player1_id)
-        player2 = Player.query.get(player2_id)
-        
-        if not player1 or not player2:
-            raise ValueError("Both players must exist")
-        
-        if player1_id == player2_id:
-            raise ValueError("Cannot record match with same player")
-            
-        # Ensure player1_id is the smaller ID
-        if player1_id > player2_id:
-            # Swap player IDs and scores
-            player1_id, player2_id = player2_id, player1_id
-            player1_score, player2_score = player2_score, player1_score
-            
-        # Determine winner based on scores
-        winner_id = player1_id if player1_score > player2_score else player2_id
-            
-        return SingleMatch(
-            player1_id=player1_id,
-            player2_id=player2_id,
-            player1_score=player1_score,
-            player2_score=player2_score,
-            winner_id=winner_id
-        )
-
 class DoubleMatch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     team1_pair_id = db.Column(db.Integer, db.ForeignKey('pair.id'), nullable=False)
@@ -183,7 +140,6 @@ def add_pair():
 def players():
     try:
         players = Player.query.order_by(Player.name).all()
-        print("**** ", players)
         return render_template('players.html', players=players)
     except Exception as e:
         flash(f"Error loading players: {str(e)}")
@@ -204,44 +160,6 @@ def add_player():
         db.session.commit()
         return redirect(url_for('players'))
     return render_template('add_player.html')
-
-@app.route('/matches')
-def matches():
-    try:
-        matches = SingleMatch.query.order_by(SingleMatch.match_date.desc()).all()
-        return render_template('matches.html', matches=matches)
-    except Exception as e:
-        flash(f"Error loading matches: {str(e)}")
-        return render_template('matches.html', matches=[])
-
-@app.route('/add_match', methods=['GET', 'POST'])
-def add_match():
-    if request.method == 'POST':
-        try:
-            player1_id = int(request.form['player1'])
-            player2_id = int(request.form['player2'])
-            player1_score = int(request.form['player1_score'])
-            player2_score = int(request.form['player2_score'])
-            
-            new_match = SingleMatch.create_match(
-                player1_id, 
-                player2_id, 
-                player1_score, 
-                player2_score
-            )
-            
-            db.session.add(new_match)
-            db.session.commit()
-            return redirect(url_for('matches'))
-            
-        except ValueError as e:
-            flash(str(e))
-        except Exception as e:
-            db.session.rollback()
-            flash('Error recording match!')
-            
-    players = Player.query.order_by(Player.name).all()
-    return render_template('add_match.html', players=players)
 
 @app.route('/double_matches')
 def double_matches():
@@ -281,12 +199,10 @@ def add_double_match():
 def admin():
     players = Player.query.order_by(Player.name).all()
     pairs = Pair.query.all()
-    single_matches = SingleMatch.query.order_by(SingleMatch.match_date.desc()).all()
     double_matches = DoubleMatch.query.order_by(DoubleMatch.match_date.desc()).all()
     return render_template('admin.html', 
                          players=players,
                          pairs=pairs,
-                         single_matches=single_matches,
                          double_matches=double_matches)
 
 @app.route('/delete/player/<int:id>', methods=['POST'])
@@ -311,18 +227,6 @@ def delete_pair(id):
     except Exception as e:
         db.session.rollback()
         flash('Error deleting pair: Pair might be referenced in matches')
-    return redirect(url_for('admin'))
-
-@app.route('/delete/single_match/<int:id>', methods=['POST'])
-def delete_single_match(id):
-    try:
-        match = SingleMatch.query.get_or_404(id)
-        db.session.delete(match)
-        db.session.commit()
-        flash('Single match deleted successfully')
-    except Exception as e:
-        db.session.rollback()
-        flash('Error deleting match')
     return redirect(url_for('admin'))
 
 @app.route('/delete/double_match/<int:id>', methods=['POST'])
