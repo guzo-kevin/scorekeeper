@@ -22,25 +22,16 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Active</th>
                     <th>Matches</th>
                     <th>Win/Loss</th>
                     <th>Win Rate</th>
+                    <th>Present</th>
                 </tr>
             </thead>
             <tbody>
                 {% for player in players %}
                 <tr class="{% if not player.is_active %}inactive-player{% endif %}">
                     <td>{{ player.name }}</td>
-                    <td>
-                        <label class="toggle">
-                            <input type="checkbox" 
-                                   {% if player.is_active %}checked{% endif %}
-                                   data-player-id="{{ player.id }}"
-                                   class="status-toggle">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </td>
                     <td>{{ player.total_matches }}</td>
                     <td>
                         <span class="win-count">{{ player.wins }}</span> / 
@@ -52,6 +43,15 @@
                         {% else %}
                             -
                         {% endif %}
+                    </td>
+                    <td>
+                        <label class="toggle">
+                            <input type="checkbox" 
+                                   {% if player.is_active %}checked{% endif %}
+                                   data-player-id="{{ player.id }}"
+                                   class="status-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </td>
                 </tr>
                 {% endfor %}
