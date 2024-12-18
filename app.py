@@ -158,6 +158,24 @@ def add_pair():
                 flash('Cannot create a pair with the same player')
                 return redirect(url_for('add_pair'))
             
+            # Get both players
+            player1 = Player.query.get(player1_id)
+            player2 = Player.query.get(player2_id)
+            
+            # Order players by name
+            if player1.name > player2.name:
+                player1_id, player2_id = player2_id, player1_id
+            
+            # Check if pair already exists
+            existing_pair = Pair.query.filter(
+                ((Pair.player1_id == player1_id) & (Pair.player2_id == player2_id)) |
+                ((Pair.player1_id == player2_id) & (Pair.player2_id == player1_id))
+            ).first()
+            
+            if existing_pair:
+                flash('This pair already exists!')
+                return redirect(url_for('add_pair'))
+            
             new_pair = Pair(player1_id=player1_id, player2_id=player2_id)
             db.session.add(new_pair)
             db.session.commit()
