@@ -112,8 +112,32 @@ with app.app_context():
 
 @app.route('/pairs')
 def pairs():
-    pairs = Pair.query.all()
-    return render_template('pairs.html', pairs=pairs)
+    try:
+        pairs = Pair.query.all()
+        
+        # Calculate win/loss records for each pair
+        for pair in pairs:
+            # Count wins (where this pair is the winner)
+            wins = DoubleMatch.query.filter(
+                DoubleMatch.winner_pair_id == pair.id
+            ).count()
+            
+            # Count total matches (where this pair was team1 or team2)
+            total_matches = DoubleMatch.query.filter(
+                (DoubleMatch.team1_pair_id == pair.id) |
+                (DoubleMatch.team2_pair_id == pair.id)
+            ).count()
+            
+            # Calculate statistics
+            pair.wins = wins
+            pair.losses = total_matches - wins
+            pair.total_matches = total_matches
+            pair.win_rate = (wins / total_matches * 100) if total_matches > 0 else 0
+            
+        return render_template('pairs.html', pairs=pairs)
+    except Exception as e:
+        flash(f"Error loading pairs: {str(e)}")
+        return render_template('pairs.html', pairs=[])
 
 @app.route('/add_pair', methods=['GET', 'POST'])
 def add_pair():

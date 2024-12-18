@@ -1,23 +1,70 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="header">
-    <h1>Doubles Pairs</h1>
+    <h1>Badminton Pairs</h1>
     <a href="{{ url_for('add_pair') }}" class="btn-add">
-        <span class="material-icons">add</span>
+        <span class="material-icons">group_add</span>
         New Pair
     </a>
 </div>
 
-<div class="pairs-list">
-    {% for pair in pairs %}
-    <div class="pair-card">
-        <div class="pair-info">
-            <h3>{{ pair.player1.name }} / {{ pair.player2.name }}</h3>
-            <div class="pair-details">
-                <span>Created: {{ pair.created_date.strftime('%Y-%m-%d') }}</span>
-            </div>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% if pairs %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Player 1</th>
+                    <th>Player 2</th>
+                    <th>Created Date</th>
+                    <th>Matches</th>
+                    <th>Win/Loss</th>
+                    <th>Win Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pair in pairs %}
+                <tr>
+                    <td>{{ pair.id }}</td>
+                    <td>{{ pair.player1.name }}</td>
+                    <td>{{ pair.player2.name }}</td>
+                    <td>{{ pair.created_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ pair.total_matches }}</td>
+                    <td>
+                        <span class="win-count">{{ pair.wins }}</span> / 
+                        <span class="loss-count">{{ pair.losses }}</span>
+                    </td>
+                    <td>
+                        {% if pair.total_matches > 0 %}
+                            {{ "%.1f"|format(pair.win_rate) }}%
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-content">
+            <span class="material-icons empty-icon">groups</span>
+            <h2>No Pairs Yet</h2>
+            <p>Start by creating your first pair!</p>
+            <a href="{{ url_for('add_pair') }}" class="btn-submit">
+                <span class="material-icons">group_add</span>
+                Create First Pair
+            </a>
         </div>
     </div>
-    {% endfor %}
-</div>
+{% endif %}
 {% endblock %} 
