@@ -1,27 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Player Management System</title>
+    <title>Badminton Management System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-brand">🎮 Player Hub</div>
+        <div class="nav-brand">🎮 Badminton Hub</div>
         <div class="nav-links">
-            <a href="{{ url_for('players') }}" class="nav-item">
-                <span class="material-icons">groups</span>
-                Players
-            </a>
-            <a href="{{ url_for('add_player') }}" class="nav-item">
-                <span class="material-icons">person_add</span>
-                Add Player
-            </a>
+            <!-- Players Section -->
+            <div class="nav-group">
+                <a href="{{ url_for('players') }}" class="nav-item">
+                    <span class="material-icons">people</span>
+                    Players
+                </a>
+                <a href="{{ url_for('add_player') }}" class="nav-item">
+                    <span class="material-icons">person_add</span>
+                    Add Player
+                </a>
+            </div>
+
+            <!-- Pairs Section -->
+            <div class="nav-group">
+                <a href="{{ url_for('pairs') }}" class="nav-item">
+                    <span class="material-icons">groups</span>
+                    Pairs
+                </a>
+                <a href="{{ url_for('add_pair') }}" class="nav-item">
+                    <span class="material-icons">group_add</span>
+                    Add Pair
+                </a>
+            </div>
+
+            <!-- Matches Section -->
+            <div class="nav-group">
+                <a href="{{ url_for('matches') }}" class="nav-item">
+                    <span class="material-icons">sports_tennis</span>
+                    Singles
+                </a>
+                <a href="{{ url_for('add_match') }}" class="nav-item">
+                    <span class="material-icons">add_circle</span>
+                    Add Single
+                </a>
+            </div>
+
+            <!-- Double Matches Section -->
+            <div class="nav-group">
+                <a href="{{ url_for('double_matches') }}" class="nav-item">
+                    <span class="material-icons">sports</span>
+                    Doubles
+                </a>
+                <a href="{{ url_for('add_double_match') }}" class="nav-item">
+                    <span class="material-icons">add_circle</span>
+                    Add Double
+                </a>
+            </div>
         </div>
     </nav>
+
     <main class="container">
         {% block content %}{% endblock %}
     </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            Badminton Management System
+        </div>
+    </footer>
 </body>
 </html>

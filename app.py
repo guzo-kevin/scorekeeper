@@ -179,45 +179,55 @@ def add_pair():
     return render_template('add_pair.html', players=players)
 
 @app.route('/')
+@app.route('/players')
 def players():
-    players = Player.query.all()
-    return render_template('players.html', players=players)
+    try:
+        players = Player.query.order_by(Player.name).all()
+        print("**** ", players)
+        return render_template('players.html', players=players)
+    except Exception as e:
+        flash(f"Error loading players: {str(e)}")
+        return render_template('players.html', players=[])
 
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
     if request.method == 'POST':
         name = request.form['name']
-        email = request.form.get('email', '')
-        rank = request.form.get('rank', 'Rookie')
-        score = request.form.get('score', 0)
+        sex = request.form['sex']
         
         new_player = Player(
             name=name,
-            email=email,
-            rank=rank,
-            score=score
+            sex=sex,
+            join_date=datetime.utcnow()
         )
         db.session.add(new_player)
         db.session.commit()
         return redirect(url_for('players'))
     return render_template('add_player.html')
 
+@app.route('/matches')
+def matches():
+    try:
+        matches = SingleMatch.query.order_by(SingleMatch.match_date.desc()).all()
+        return render_template('matches.html', matches=matches)
+    except Exception as e:
+        flash(f"Error loading matches: {str(e)}")
+        return render_template('matches.html', matches=[])
+
 @app.route('/add_match', methods=['GET', 'POST'])
 def add_match():
     if request.method == 'POST':
         try:
-            # Get form data
             player1_id = int(request.form['player1'])
             player2_id = int(request.form['player2'])
-            score1 = int(request.form['player1_score'])
-            score2 = int(request.form['player2_score'])
+            player1_score = int(request.form['player1_score'])
+            player2_score = int(request.form['player2_score'])
             
-            # Create match (the create_match method will handle ID ordering)
             new_match = SingleMatch.create_match(
                 player1_id, 
                 player2_id, 
-                score1, 
-                score2
+                player1_score, 
+                player2_score
             )
             
             db.session.add(new_match)

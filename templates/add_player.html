@@ -2,35 +2,43 @@
 {% block content %}
 <div class="form-container">
     <h1>Add New Player</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
     <form method="POST" class="player-form">
         <div class="form-group">
-            <label>Name</label>
-            <input type="text" name="name" required>
+            <label>Name *</label>
+            <input 
+                type="text" 
+                name="name" 
+                required 
+                placeholder="Enter player name"
+                class="form-input"
+            >
         </div>
         
         <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email">
-        </div>
-
-        <div class="form-group">
-            <label>Rank</label>
-            <select name="rank">
-                <option value="Rookie">Rookie</option>
-                <option value="Amateur">Amateur</option>
-                <option value="Pro">Pro</option>
-                <option value="Expert">Expert</option>
-                <option value="Master">Master</option>
+            <label>Sex *</label>
+            <select name="sex" required class="form-input">
+                <option value="">Select gender</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+                <option value="U">Unspecified</option>
             </select>
         </div>
 
-        <div class="form-group">
-            <label>Initial Score</label>
-            <input type="number" name="score" value="0">
+        <div class="form-note">
+            <span class="required">*</span> Required fields
         </div>
 
         <button type="submit" class="btn-submit">
-            <span class="material-icons">save</span>
+            <span class="material-icons">person_add</span>
             Add Player
         </button>
     </form>

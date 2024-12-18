@@ -8,34 +8,67 @@
     </a>
 </div>
 
-<div class="matches-list">
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Team 1</th>
-                <th>Score</th>
-                <th>Team 2</th>
-                <th>Winner</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for match in matches %}
-            <tr>
-                <td>{{ match.match_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ match.team1_player1.name }} / {{ match.team1_player2.name }}</td>
-                <td>{{ match.team1_score }} - {{ match.team2_score }}</td>
-                <td>{{ match.team2_player1.name }} / {{ match.team2_player2.name }}</td>
-                <td>
-                    {% if match.team1_score > match.team2_score %}
-                        Team 1
-                    {% else %}
-                        Team 2
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% if matches %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Team 1</th>
+                    <th>Score</th>
+                    <th>Team 2</th>
+                    <th>Winner</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in matches %}
+                <tr>
+                    <td>{{ match.match_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {{ match.team1_pair.player1.name }} / 
+                        {{ match.team1_pair.player2.name }}
+                    </td>
+                    <td class="score-column">
+                        <span class="{% if match.team1_score > match.team2_score %}winner-score{% endif %}">
+                            {{ match.team1_score }}
+                        </span>
+                        -
+                        <span class="{% if match.team2_score > match.team1_score %}winner-score{% endif %}">
+                            {{ match.team2_score }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ match.team2_pair.player1.name }} / 
+                        {{ match.team2_pair.player2.name }}
+                    </td>
+                    <td>
+                        {{ match.winner_pair.player1.name }} / 
+                        {{ match.winner_pair.player2.name }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-content">
+            <span class="material-icons empty-icon">sports</span>
+            <h2>No Doubles Matches Yet</h2>
+            <p>Start recording your first doubles match!</p>
+            <a href="{{ url_for('add_double_match') }}" class="btn-submit">
+                <span class="material-icons">add</span>
+                Record First Match
+            </a>
+        </div>
+    </div>
+{% endif %}
 {% endblock %} 

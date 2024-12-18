@@ -16,38 +16,52 @@
     {% endif %}
 {% endwith %}
 
-<div class="players-list">
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Sex</th>
-                <th>Join Date</th>
-                <th>Pairs</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for player in players %}
-            <tr>
-                <td>{{ player.id }}</td>
-                <td>{{ player.name }}</td>
-                <td>
-                    {% if player.sex.value == 'M' %}♂️
-                    {% elif player.sex.value == 'F' %}♀️
-                    {% else %}?
-                    {% endif %}
-                    {{ player.sex.value }}
-                </td>
-                <td>{{ player.join_date.strftime('%Y-%m-%d') }}</td>
-                <td>
-                    <a href="{{ url_for('add_pair') }}" class="btn-small">
-                        <span class="material-icons">group_add</span>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+{% if players %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Sex</th>
+                    <th>Join Date</th>
+                    <th>Pairs</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td>{{ player.id }}</td>
+                    <td>{{ player.name }}</td>
+                    <td>
+                        {% if player.sex.value == 'M' %}♂️
+                        {% elif player.sex.value == 'F' %}♀️
+                        {% else %}?
+                        {% endif %}
+                        {{ player.sex.value }}
+                    </td>
+                    <td>{{ player.join_date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        {# <a href="{{ url_for('add_pair') }}" class="btn-small">
+                            <span class="material-icons">group_add</span>
+                        </a> #}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-content">
+            <span class="material-icons empty-icon">people_outline</span>
+            <h2>No Players Yet</h2>
+            <p>Start by adding your first player!</p>
+            <a href="{{ url_for('add_player') }}" class="btn-submit">
+                <span class="material-icons">person_add</span>
+                Add First Player
+            </a>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}

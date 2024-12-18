@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+    <h1>Singles Matches</h1>
+    <a href="{{ url_for('add_match') }}" class="btn-add">
+        <span class="material-icons">add</span>
+        New Match
+    </a>
+</div>
+
+<div class="matches-list">
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Player 1</th>
+                <th>Score</th>
+                <th>Player 2</th>
+                <th>Winner</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in matches %}
+            <tr>
+                <td>{{ match.match_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ match.player1.name }}</td>
+                <td>{{ match.player1_score }} - {{ match.player2_score }}</td>
+                <td>{{ match.player2.name }}</td>
+                <td>{{ match.winner.name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 
