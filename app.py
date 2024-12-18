@@ -150,22 +150,26 @@ def pairs():
 @app.route('/add_pair', methods=['GET', 'POST'])
 def add_pair():
     if request.method == 'POST':
-        player1_id = int(request.form['player1'])
-        player2_id = int(request.form['player2'])
-        
         try:
-            new_pair = Pair.create_pair(player1_id, player2_id)
+            player1_id = int(request.form['player1'])
+            player2_id = int(request.form['player2'])
+            
+            if player1_id == player2_id:
+                flash('Cannot create a pair with the same player')
+                return redirect(url_for('add_pair'))
+            
+            new_pair = Pair(player1_id=player1_id, player2_id=player2_id)
             db.session.add(new_pair)
             db.session.commit()
             return redirect(url_for('pairs'))
-        except ValueError as e:
-            flash(str(e))
-        except IntegrityError:
-            db.session.rollback()
-            flash('This pair already exists!')
             
-    players = Player.query.order_by(Player.name).all()
-    return render_template('add_pair.html', players=players)
+        except Exception as e:
+            db.session.rollback()
+            flash('Error creating pair!')
+    
+    # Get only active players
+    active_players = Player.query.filter(Player.is_active == True).order_by(Player.name).all()
+    return render_template('add_pair.html', players=active_players)
 
 @app.route('/')
 @app.route('/players')

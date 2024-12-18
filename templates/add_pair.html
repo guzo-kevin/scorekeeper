@@ -10,32 +10,50 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    
-    <form method="POST" class="pair-form">
-        <div class="form-group">
-            <label>Player 1</label>
-            <select name="player1" required>
-                <option value="">Select player</option>
-                {% for player in players %}
-                <option value="{{ player.id }}">{{ player.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label>Player 2</label>
-            <select name="player2" required>
-                <option value="">Select player</option>
-                {% for player in players %}
-                <option value="{{ player.id }}">{{ player.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
 
-        <button type="submit" class="btn-submit">
-            <span class="material-icons">group_add</span>
-            Create Pair
-        </button>
-    </form>
+    {% if players|length < 2 %}
+        <div class="empty-state">
+            <div class="empty-state-content">
+                <span class="material-icons empty-icon">person_off</span>
+                <h2>Not Enough Active Players</h2>
+                <p>You need at least two active players to create a pair.</p>
+                <a href="{{ url_for('players') }}" class="btn-submit">
+                    <span class="material-icons">people</span>
+                    Manage Players
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <form method="POST" class="pair-form">
+            <div class="form-group">
+                <label>Player 1 *</label>
+                <select name="player1" required class="form-input">
+                    <option value="">Select player</option>
+                    {% for player in players %}
+                    <option value="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Player 2 *</label>
+                <select name="player2" required class="form-input">
+                    <option value="">Select player</option>
+                    {% for player in players %}
+                    <option value="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-note">
+                <span class="required">*</span> Required fields
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <span class="material-icons">group_add</span>
+                Create Pair
+            </button>
+        </form>
+    {% endif %}
 </div>
 {% endblock %} 
