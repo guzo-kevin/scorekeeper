@@ -108,6 +108,48 @@ class SingleMatch(db.Model):
             winner_id=winner_id
         )
 
+class DoubleMatch(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    team1_pair_id = db.Column(db.Integer, db.ForeignKey('pair.id'), nullable=False)
+    team2_pair_id = db.Column(db.Integer, db.ForeignKey('pair.id'), nullable=False)
+    team1_score = db.Column(db.Integer, nullable=False)
+    team2_score = db.Column(db.Integer, nullable=False)
+    winner_pair_id = db.Column(db.Integer, db.ForeignKey('pair.id'), nullable=False)
+    match_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Define relationships
+    team1_pair = db.relationship('Pair', foreign_keys=[team1_pair_id])
+    team2_pair = db.relationship('Pair', foreign_keys=[team2_pair_id])
+    winner_pair = db.relationship('Pair', foreign_keys=[winner_pair_id])
+
+    @staticmethod
+    def create_match(team1_pair_id, team2_pair_id, team1_score, team2_score):
+        # Verify pairs exist
+        team1_pair = Pair.query.get(team1_pair_id)
+        team2_pair = Pair.query.get(team2_pair_id)
+        
+        if not team1_pair or not team2_pair:
+            raise ValueError("Both pairs must exist")
+        
+        if team1_pair_id == team2_pair_id:
+            raise ValueError("Cannot have same pair on both teams")
+            
+        # Order teams (smaller pair ID becomes team1)
+        if team1_pair_id > team2_pair_id:
+            team1_pair_id, team2_pair_id = team2_pair_id, team1_pair_id
+            team1_score, team2_score = team2_score, team1_score
+            
+        # Determine winner
+        winner_pair_id = team1_pair_id if team1_score > team2_score else team2_pair_id
+            
+        return DoubleMatch(
+            team1_pair_id=team1_pair_id,
+            team2_pair_id=team2_pair_id,
+            team1_score=team1_score,
+            team2_score=team2_score,
+            winner_pair_id=winner_pair_id
+        )
+
 with app.app_context():
     db.create_all()
 
@@ -138,7 +180,7 @@ def add_pair():
 
 @app.route('/')
 def players():
-    players = Player.query.order_by(Player.score.desc()).all()
+    players = Player.query.all()
     return render_template('players.html', players=players)
 
 @app.route('/add_player', methods=['GET', 'POST'])
@@ -190,6 +232,40 @@ def add_match():
             
     players = Player.query.order_by(Player.name).all()
     return render_template('add_match.html', players=players)
+
+@app.route('/double_matches')
+def double_matches():
+    matches = DoubleMatch.query.order_by(DoubleMatch.match_date.desc()).all()
+    return render_template('double_matches.html', matches=matches)
+
+@app.route('/add_double_match', methods=['GET', 'POST'])
+def add_double_match():
+    if request.method == 'POST':
+        try:
+            team1_pair_id = int(request.form['team1_pair'])
+            team2_pair_id = int(request.form['team2_pair'])
+            team1_score = int(request.form['team1_score'])
+            team2_score = int(request.form['team2_score'])
+            
+            new_match = DoubleMatch.create_match(
+                team1_pair_id,
+                team2_pair_id,
+                team1_score,
+                team2_score
+            )
+            
+            db.session.add(new_match)
+            db.session.commit()
+            return redirect(url_for('double_matches'))
+            
+        except ValueError as e:
+            flash(str(e))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error recording match!')
+            
+    pairs = Pair.query.all()
+    return render_template('add_double_match.html', pairs=pairs)
 
 if __name__ == '__main__':
     app.run(debug=True)
