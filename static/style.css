@@ -160,3 +160,28 @@ th, td {
 .required {
     color: var(--danger);
 }
+
+/* Admin Styles */
+.admin-section {
+    background: white;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+}
+
+.admin-section h2 {
+    margin-bottom: 1rem;
+}
+
+.btn-delete {
+    background: var(--danger);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background: #d32f2f;
+}

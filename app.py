@@ -277,6 +277,66 @@ def add_double_match():
     pairs = Pair.query.all()
     return render_template('add_double_match.html', pairs=pairs)
 
+@app.route('/admin')
+def admin():
+    players = Player.query.order_by(Player.name).all()
+    pairs = Pair.query.all()
+    single_matches = SingleMatch.query.order_by(SingleMatch.match_date.desc()).all()
+    double_matches = DoubleMatch.query.order_by(DoubleMatch.match_date.desc()).all()
+    return render_template('admin.html', 
+                         players=players,
+                         pairs=pairs,
+                         single_matches=single_matches,
+                         double_matches=double_matches)
+
+@app.route('/delete/player/<int:id>', methods=['POST'])
+def delete_player(id):
+    try:
+        player = Player.query.get_or_404(id)
+        db.session.delete(player)
+        db.session.commit()
+        flash('Player deleted successfully')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error deleting player: Player might be referenced in pairs or matches')
+    return redirect(url_for('admin'))
+
+@app.route('/delete/pair/<int:id>', methods=['POST'])
+def delete_pair(id):
+    try:
+        pair = Pair.query.get_or_404(id)
+        db.session.delete(pair)
+        db.session.commit()
+        flash('Pair deleted successfully')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error deleting pair: Pair might be referenced in matches')
+    return redirect(url_for('admin'))
+
+@app.route('/delete/single_match/<int:id>', methods=['POST'])
+def delete_single_match(id):
+    try:
+        match = SingleMatch.query.get_or_404(id)
+        db.session.delete(match)
+        db.session.commit()
+        flash('Single match deleted successfully')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error deleting match')
+    return redirect(url_for('admin'))
+
+@app.route('/delete/double_match/<int:id>', methods=['POST'])
+def delete_double_match(id):
+    try:
+        match = DoubleMatch.query.get_or_404(id)
+        db.session.delete(match)
+        db.session.commit()
+        flash('Double match deleted successfully')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error deleting match')
+    return redirect(url_for('admin'))
+
 if __name__ == '__main__':
     # app.run(debug=True)
     app.run(host='0.0.0.0', port=8080, debug=False)

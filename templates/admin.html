@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+    <h1>Admin Panel</h1>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="admin-section">
+    <h2>Players</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Sex</th>
+                    <th>Join Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td>{{ player.id }}</td>
+                    <td>{{ player.name }}</td>
+                    <td>{{ player.sex.value }}</td>
+                    <td>{{ player.join_date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_player', id=player.id) }}" 
+                              onsubmit="return confirm('Are you sure you want to delete this player?');">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h2>Pairs</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Players</th>
+                    <th>Created Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pair in pairs %}
+                <tr>
+                    <td>{{ pair.id }}</td>
+                    <td>{{ pair.player1.name }} / {{ pair.player2.name }}</td>
+                    <td>{{ pair.created_date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_pair', id=pair.id) }}"
+                              onsubmit="return confirm('Are you sure you want to delete this pair?');">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h2>Single Matches</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Players</th>
+                    <th>Score</th>
+                    <th>Winner</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in single_matches %}
+                <tr>
+                    <td>{{ match.match_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ match.player1.name }} vs {{ match.player2.name }}</td>
+                    <td>{{ match.player1_score }} - {{ match.player2_score }}</td>
+                    <td>{{ match.winner.name }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_single_match', id=match.id) }}"
+                              onsubmit="return confirm('Are you sure you want to delete this match?');">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h2>Double Matches</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Teams</th>
+                    <th>Score</th>
+                    <th>Winner</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in double_matches %}
+                <tr>
+                    <td>{{ match.match_date.strftime('%Y-%m-%-d %H:%M') }}</td>
+                    <td>
+                        {{ match.team1_pair.player1.name }}/{{ match.team1_pair.player2.name }}
+                        vs
+                        {{ match.team2_pair.player1.name }}/{{ match.team2_pair.player2.name }}
+                    </td>
+                    <td>{{ match.team1_score }} - {{ match.team2_score }}</td>
+                    <td>
+                        {{ match.winner_pair.player1.name }}/{{ match.winner_pair.player2.name }}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_double_match', id=match.id) }}"
+                              onsubmit="return confirm('Are you sure you want to delete this match?');">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

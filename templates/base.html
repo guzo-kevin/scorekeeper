@@ -3,7 +3,6 @@
 <head>
     <title>Badminton Management System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
@@ -55,6 +54,14 @@
                 <a href="{{ url_for('add_double_match') }}" class="nav-item">
                     <span class="material-icons">add_circle</span>
                     Add Double
+                </a>
+            </div>
+
+            <!-- Admin Section -->
+            <div class="nav-group">
+                <a href="{{ url_for('admin') }}" class="nav-item">
+                    <span class="material-icons">admin_panel_settings</span>
+                    Admin
                 </a>
             </div>
         </div>
