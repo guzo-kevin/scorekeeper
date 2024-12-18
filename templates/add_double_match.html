@@ -24,7 +24,7 @@
             </div>
         </div>
     {% else %}
-        <form method="POST" class="match-form" onsubmit="return validateScores()">
+        <form method="POST" class="match-form" onsubmit="return validateForm()">
             <div class="team-section">
                 <h2>Team 1</h2>
                 <div class="form-group">
@@ -92,7 +92,16 @@
 </div>
 
 <script>
-function validateScores() {
+function validateForm() {
+    // Get selected pairs
+    const team1Select = document.querySelector('select[name="team1_pair"]');
+    const team2Select = document.querySelector('select[name="team2_pair"]');
+    
+    if (team1Select.value === team2Select.value) {
+        alert('Cannot select the same pair for both teams');
+        return false;
+    }
+    
     const team1Score = parseInt(document.querySelector('input[name="team1_score"]').value);
     const team2Score = parseInt(document.querySelector('input[name="team2_score"]').value);
     
@@ -100,7 +109,18 @@ function validateScores() {
         alert('Scores cannot be equal - there must be a winner');
         return false;
     }
+    
     return true;
 }
+
+// Optional: Disable selection of the same pair in the other dropdown
+document.querySelectorAll('select[name^="team"]').forEach(select => {
+    select.addEventListener('change', function() {
+        const otherSelect = document.querySelector(`select[name^="team"]:not([name="${this.name}"])`);
+        Array.from(otherSelect.options).forEach(option => {
+            option.disabled = option.value === this.value && option.value !== '';
+        });
+    });
+});
 </script>
 {% endblock %} 

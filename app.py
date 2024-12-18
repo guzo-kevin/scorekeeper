@@ -264,6 +264,32 @@ def add_double_match():
                 flash('Cannot record a match between the same pair')
                 return redirect(url_for('add_double_match'))
             
+            # Get both pairs to check for player overlap
+            team1_pair = Pair.query.get(team1_pair_id)
+            team2_pair = Pair.query.get(team2_pair_id)
+            
+            # Check for player overlap
+            team1_players = {team1_pair.player1_id, team1_pair.player2_id}
+            team2_players = {team2_pair.player1_id, team2_pair.player2_id}
+            
+            overlapping_players = team1_players & team2_players
+            if overlapping_players:
+                # Get the overlapping player(s) names
+                overlapping_names = []
+                for player_id in overlapping_players:
+                    player = Player.query.get(player_id)
+                    overlapping_names.append(player.name)
+                
+                # Format the error message
+                error_msg = (
+                    f"Player{'s' if len(overlapping_names) > 1 else ''} "
+                    f"{', '.join(overlapping_names)} cannot play in both pairs:\n"
+                    f"Team 1: {team1_pair.player1.name} / {team1_pair.player2.name}\n"
+                    f"Team 2: {team2_pair.player1.name} / {team2_pair.player2.name}"
+                )
+                flash(error_msg)
+                return redirect(url_for('add_double_match'))
+            
             # Validate scores cannot be equal
             if team1_score == team2_score:
                 flash('Scores cannot be equal - there must be a winner')
