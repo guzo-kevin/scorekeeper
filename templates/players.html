@@ -22,7 +22,6 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Sex</th>
                     <th>ELO Rating</th>
                     <th>Matches</th>
                     <th>Win Rate</th>
@@ -34,7 +33,6 @@
                 {% for player in players %}
                 <tr class="{% if not player.is_active %}inactive-player{% endif %}">
                     <td>{{ player.name }}</td>
-                    <td>{{ player.sex.value }}</td>
                     <td>{{ "%.1f"|format(player.elo_rating) }}</td>
                     <td>{{ player.total_matches }}</td>
                     <td>
