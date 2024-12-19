@@ -18,32 +18,33 @@
 
 {% if players %}
     <div class="table-container">
-        <table>
+        <table class="table">
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Sex</th>
+                    <th>ELO Rating</th>
                     <th>Matches</th>
-                    <th>Win/Loss</th>
                     <th>Win Rate</th>
-                    <th>Present</th>
+                    <th>Record (W-L)</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for player in players %}
                 <tr class="{% if not player.is_active %}inactive-player{% endif %}">
                     <td>{{ player.name }}</td>
+                    <td>{{ player.sex.value }}</td>
+                    <td>{{ "%.1f"|format(player.elo_rating) }}</td>
                     <td>{{ player.total_matches }}</td>
                     <td>
-                        <span class="win-count">{{ player.wins }}</span> / 
-                        <span class="loss-count">{{ player.losses }}</span>
-                    </td>
-                    <td>
-                        {% if player.total_matches > 0 %}
+                        {% if player.win_rate >= 0 %}
                             {{ "%.1f"|format(player.win_rate) }}%
                         {% else %}
-                            -
+                            N/A
                         {% endif %}
                     </td>
+                    <td>{{ player.wins }}-{{ player.losses }}</td>
                     <td>
                         <label class="toggle">
                             <input type="checkbox" 

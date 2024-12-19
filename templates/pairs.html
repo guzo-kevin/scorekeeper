@@ -18,33 +18,30 @@
 
 {% if pairs %}
     <div class="table-container">
-        <table>
+        <table class="table">
             <thead>
                 <tr>
-                    <th>Player 1</th>
-                    <th>Player 2</th>
+                    <th>Players</th>
+                    <th>ELO Rating</th>
                     <th>Matches</th>
-                    <th>Win/Loss</th>
                     <th>Win Rate</th>
+                    <th>Record (W-L)</th>
                 </tr>
             </thead>
             <tbody>
                 {% for pair in pairs %}
                 <tr>
-                    <td>{{ pair.player1.name }}</td>
-                    <td>{{ pair.player2.name }}</td>
+                    <td>{{ pair.player1.name }} / {{ pair.player2.name }}</td>
+                    <td>{{ "%.1f"|format(pair.elo_rating) }}</td>
                     <td>{{ pair.total_matches }}</td>
                     <td>
-                        <span class="win-count">{{ pair.wins }}</span> / 
-                        <span class="loss-count">{{ pair.losses }}</span>
-                    </td>
-                    <td>
-                        {% if pair.total_matches > 0 %}
+                        {% if pair.win_rate >= 0 %}
                             {{ "%.1f"|format(pair.win_rate) }}%
                         {% else %}
-                            -
+                            N/A
                         {% endif %}
                     </td>
+                    <td>{{ pair.wins }}-{{ pair.losses }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

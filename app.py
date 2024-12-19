@@ -22,12 +22,14 @@ class Player(db.Model):
     sex = db.Column(db.Enum(Sex), nullable=False, default=Sex.U)
     join_date = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
+    elo_rating = db.Column(db.Float, default=1200.0)
 
 class Pair(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player1_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     player2_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    elo_rating = db.Column(db.Float, default=1200.0)
 
     # Define relationships
     player1 = db.relationship('Player', foreign_keys=[player1_id])
@@ -138,7 +140,8 @@ def pairs():
         
         # Sort pairs by win rate (descending) and total matches (descending)
         pairs = sorted(pairs, 
-                      key=lambda x: (x.win_rate if x.win_rate >= 0 else float('-inf'),
+                      key=lambda x: (x.elo_rating,  # 首先按ELO排序
+                                   x.win_rate if x.win_rate >= 0 else float('-inf'),
                                    -x.total_matches),
                       reverse=True)
             
@@ -220,7 +223,8 @@ def players():
         
         # Sort players by win rate (descending)
         players = sorted(players, 
-                        key=lambda x: (x.win_rate if x.win_rate >= 0 else float('-inf'), 
+                        key=lambda x: (x.elo_rating,  # 首先按ELO排序
+                                     x.win_rate if x.win_rate >= 0 else float('-inf'), 
                                      -x.total_matches),
                         reverse=True)
             
@@ -249,6 +253,29 @@ def add_player():
 def double_matches():
     matches = DoubleMatch.query.order_by(DoubleMatch.match_date.desc()).all()
     return render_template('double_matches.html', matches=matches)
+
+def calculate_elo_change(rating_a, rating_b, score_a, score_b, k_factor=32):
+    """
+    计算ELO评分变化
+    rating_a: A方当前ELO评分
+    rating_b: B方当前ELO评分
+    score_a: A方得分
+    score_b: B方得分
+    k_factor: ELO系统的K因子，影响评分变化的幅度
+    """
+    # 计算胜率期望值
+    expected_a = 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
+    expected_b = 1 - expected_a
+    
+    # 计算实际得分（1=胜，0=负）
+    actual_a = 1 if score_a > score_b else 0
+    actual_b = 1 - actual_a
+    
+    # 计算评分变化
+    change_a = k_factor * (actual_a - expected_a)
+    change_b = k_factor * (actual_b - expected_b)
+    
+    return change_a, change_b
 
 @app.route('/add_double_match', methods=['GET', 'POST'])
 def add_double_match():
@@ -298,6 +325,7 @@ def add_double_match():
             # Create the match with the winner determined by scores
             winner_pair_id = team1_pair_id if team1_score > team2_score else team2_pair_id
             
+            # 创建新比赛
             new_match = DoubleMatch(
                 team1_pair_id=team1_pair_id,
                 team2_pair_id=team2_pair_id,
@@ -306,8 +334,36 @@ def add_double_match():
                 winner_pair_id=winner_pair_id
             )
             
+            # 获取相关的配对
+            team1_pair = Pair.query.get(team1_pair_id)
+            team2_pair = Pair.query.get(team2_pair_id)
+            
+            # 更新配对的ELO评分
+            pair_elo_change = calculate_elo_change(
+                team1_pair.elo_rating,
+                team2_pair.elo_rating,
+                team1_score,
+                team2_score
+            )
+            
+            team1_pair.elo_rating += pair_elo_change[0]
+            team2_pair.elo_rating += pair_elo_change[1]
+            
+            # 更新玩家的ELO评分（变化量减半，因为是团队比赛）
+            player_elo_change = (pair_elo_change[0] / 2, pair_elo_change[1] / 2)
+            
+            # 更新team1的玩家
+            team1_pair.player1.elo_rating += player_elo_change[0]
+            team1_pair.player2.elo_rating += player_elo_change[0]
+            
+            # 更新team2的玩家
+            team2_pair.player1.elo_rating += player_elo_change[1]
+            team2_pair.player2.elo_rating += player_elo_change[1]
+            
+            # 保存所有更改
             db.session.add(new_match)
             db.session.commit()
+            
             return redirect(url_for('double_matches'))
             
         except ValueError as e:
@@ -396,6 +452,35 @@ def delete_pair(id):
 def delete_double_match(id):
     try:
         match = DoubleMatch.query.get_or_404(id)
+        
+        # 获取相关的配对
+        team1_pair = match.team1_pair
+        team2_pair = match.team2_pair
+        
+        # 计算原始ELO变化（用负分数来反转变化）
+        pair_elo_change = calculate_elo_change(
+            team1_pair.elo_rating,
+            team2_pair.elo_rating,
+            match.team2_score,  # 反转分数
+            match.team1_score   # 反转分数
+        )
+        
+        # 恢复配对的ELO评分
+        team1_pair.elo_rating += pair_elo_change[0]
+        team2_pair.elo_rating += pair_elo_change[1]
+        
+        # 恢复玩家的ELO评分
+        player_elo_change = (pair_elo_change[0] / 2, pair_elo_change[1] / 2)
+        
+        # 恢复team1的玩家
+        team1_pair.player1.elo_rating += player_elo_change[0]
+        team1_pair.player2.elo_rating += player_elo_change[0]
+        
+        # 恢复team2的玩家
+        team2_pair.player1.elo_rating += player_elo_change[1]
+        team2_pair.player2.elo_rating += player_elo_change[1]
+        
+        # 删除比赛
         db.session.delete(match)
         db.session.commit()
         flash('Double match deleted successfully')
@@ -417,5 +502,5 @@ def toggle_player_status(id):
 
 if __name__ == '__main__':
     # app.run(debug=True)
-    app.run(debug=False)
+    app.run(debug=False,port=8080)
     # app.run(host='0.0.0.0', port=8080, debug=False)
