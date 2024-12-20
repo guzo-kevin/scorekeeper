@@ -1,0 +1,33 @@
+{% extends "ios/base.html" %}
+
+{% block title %}Matches{% endblock %}
+
+{% block content %}
+<div class="ios-header">
+    <h1>Matches</h1>
+</div>
+
+<div class="match-list">
+    {% for match in matches %}
+    <div class="ios-card">
+        <div class="match-time">{{ match.match_date.strftime('%Y-%m-%d %H:%M') }}</div>
+        <div class="ios-match-card">
+            <div class="team1 {% if match.winner_pair_id == match.team1_pair_id %}ios-match-winner{% endif %}">
+                {{ match.team1_pair.player1.name }}<br>
+                {{ match.team1_pair.player2.name }}
+            </div>
+            <div class="ios-match-score">
+                <div>{{ match.team1_score }} - {{ match.team2_score }}</div>
+                <div class="ios-match-vs">vs</div>
+            </div>
+            <div class="team2 {% if match.winner_pair_id == match.team2_pair_id %}ios-match-winner{% endif %}">
+                {{ match.team2_pair.player1.name }}<br>
+                {{ match.team2_pair.player2.name }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<a href="{{ url_for('add_double_match') }}" class="ios-fab">+</a>
+{% endblock %} 

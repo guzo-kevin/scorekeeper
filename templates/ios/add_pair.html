@@ -1,0 +1,33 @@
+{% extends "ios/base.html" %}
+
+{% block title %}Add Pair{% endblock %}
+
+{% block content %}
+<div class="ios-header">
+    <a href="{{ url_for('pairs') }}" class="ios-back-button">Back</a>
+    <h1>Add Pair</h1>
+    <div style="width: 50px"></div>
+</div>
+
+<form method="POST" class="ios-form">
+    <div>
+        <label for="player1">Player 1</label>
+        <select id="player1" name="player1" required>
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div>
+        <label for="player2">Player 2</label>
+        <select id="player2" name="player2" required>
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <button type="submit" class="btn">Create Pair</button>
+</form>
+{% endblock %} 

@@ -1,0 +1,51 @@
+{% extends "ios/base.html" %}
+
+{% block title %}Admin{% endblock %}
+
+{% block content %}
+<div class="ios-header">
+    <h1>Admin</h1>
+</div>
+
+<div class="ios-card">
+    <h2>Players</h2>
+    {% for player in players %}
+    <div class="ios-form" style="margin-bottom: 10px;">
+        {{ player.name }}
+        <form method="POST" action="{{ url_for('delete_player', id=player.id) }}" style="display: inline;">
+            <button type="submit" class="btn" style="background: #FF3B30; float: right;"
+                    onclick="return confirm('Are you sure you want to delete this player?')">Delete</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="ios-card">
+    <h2>Pairs</h2>
+    {% for pair in pairs %}
+    <div class="ios-form" style="margin-bottom: 10px;">
+        {{ pair.player1.name }} / {{ pair.player2.name }}
+        <form method="POST" action="{{ url_for('delete_pair', id=pair.id) }}" style="display: inline;">
+            <button type="submit" class="btn" style="background: #FF3B30; float: right;"
+                    onclick="return confirm('Are you sure you want to delete this pair?')">Delete</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="ios-card">
+    <h2>Matches</h2>
+    {% for match in double_matches %}
+    <div class="ios-form" style="margin-bottom: 10px;">
+        {{ match.team1_pair.player1.name }}/{{ match.team1_pair.player2.name }}
+        vs
+        {{ match.team2_pair.player1.name }}/{{ match.team2_pair.player2.name }}
+        ({{ match.team1_score }}-{{ match.team2_score }})
+        <form method="POST" action="{{ url_for('delete_double_match', id=match.id) }}" style="display: inline;">
+            <button type="submit" class="btn" style="background: #FF3B30; float: right;"
+                    onclick="return confirm('Are you sure you want to delete this match?')">Delete</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 

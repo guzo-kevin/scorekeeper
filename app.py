@@ -145,10 +145,12 @@ def pairs():
                                    -x.total_matches),
                       reverse=True)
             
-        return render_template('pairs.html', pairs=pairs)
+        template = 'ios/pairs.html' if is_ios() else 'pairs.html'
+        return render_template(template, pairs=pairs)
     except Exception as e:
         flash(f"Error loading pairs: {str(e)}")
-        return render_template('pairs.html', pairs=[])
+        template = 'ios/pairs.html' if is_ios() else 'pairs.html'
+        return render_template(template, pairs=[])
 
 @app.route('/add_pair', methods=['GET', 'POST'])
 def add_pair():
@@ -190,7 +192,10 @@ def add_pair():
     
     # Get only active players
     active_players = Player.query.filter(Player.is_active == True).order_by(Player.name).all()
-    return render_template('add_pair.html', players=active_players)
+    
+    # 根据设备类型选择模板
+    template = 'ios/add_pair.html' if is_ios() else 'add_pair.html'
+    return render_template(template, players=active_players)
 
 @app.route('/')
 @app.route('/players')
@@ -228,10 +233,13 @@ def players():
                                      -x.total_matches),
                         reverse=True)
             
-        return render_template('players.html', players=players)
+        # 根据设备类型选择模板
+        template = 'ios/players.html' if is_ios() else 'players.html'
+        return render_template(template, players=players)
     except Exception as e:
         flash(f"Error loading players: {str(e)}")
-        return render_template('players.html', players=[])
+        template = 'ios/players.html' if is_ios() else 'players.html'
+        return render_template(template, players=[])
 
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
@@ -247,12 +255,14 @@ def add_player():
         db.session.add(new_player)
         db.session.commit()
         return redirect(url_for('players'))
-    return render_template('add_player.html')
+    template = 'ios/add_player.html' if is_ios() else 'add_player.html'
+    return render_template(template)
 
 @app.route('/double_matches')
 def double_matches():
     matches = DoubleMatch.query.order_by(DoubleMatch.match_date.desc()).all()
-    return render_template('double_matches.html', matches=matches)
+    template = 'ios/double_matches.html' if is_ios() else 'double_matches.html'
+    return render_template(template, matches=matches)
 
 def calculate_elo_change(rating_a, rating_b, score_a, score_b, k_factor=32):
     """
@@ -386,14 +396,16 @@ def add_double_match():
             )
         ).all()
     
-    return render_template('add_double_match.html', pairs=active_pairs)
+    template = 'ios/add_double_match.html' if is_ios() else 'add_double_match.html'
+    return render_template(template, pairs=active_pairs)
 
 @app.route('/admin')
 def admin():
     players = Player.query.order_by(Player.name).all()
     pairs = Pair.query.all()
     double_matches = DoubleMatch.query.order_by(DoubleMatch.match_date.desc()).all()
-    return render_template('admin.html', 
+    template = 'ios/admin.html' if is_ios() else 'admin.html'
+    return render_template(template, 
                          players=players,
                          pairs=pairs,
                          double_matches=double_matches)
@@ -500,7 +512,15 @@ def toggle_player_status(id):
         db.session.rollback()
         return {'status': 'error', 'message': str(e)}, 400
 
+def is_ios():
+    user_agent = request.headers.get('User-Agent', '').lower()
+    return any(device in user_agent for device in ['iphone', 'ipad'])
+
+# 在创建Flask app后添加这个上下文处理器，使is_ios在所有模板中可用
+@app.context_processor
+def utility_processor():
+    return dict(is_ios=is_ios)
+
 if __name__ == '__main__':
-    app.run(debug=False)
-    # app.run(debug=False,port=8080)
-    # app.run(host='0.0.0.0', port=8080, debug=False)
+    # app.run(debug=False)
+    app.run(host='0.0.0.0', port=8080, debug=False)

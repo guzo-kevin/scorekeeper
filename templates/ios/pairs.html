@@ -1,0 +1,40 @@
+{% extends "ios/base.html" %}
+
+{% block title %}Pairs{% endblock %}
+
+{% block content %}
+<div class="ios-header">
+    <h1>Pairs</h1>
+</div>
+
+<div class="player-list">
+    {% for pair in pairs %}
+    <div class="ios-card">
+        <div class="player-name">{{ pair.player1.name }} / {{ pair.player2.name }}</div>
+        
+        <div class="ios-stats">
+            <div class="ios-stat-item">
+                <div class="ios-stat-value">{{ "%.0f"|format(pair.elo_rating) }}</div>
+                <div class="ios-stat-label">ELO</div>
+            </div>
+            <div class="ios-stat-item">
+                <div class="ios-stat-value {% if pair.win_rate >= 50 %}win-rate-good{% else %}win-rate-bad{% endif %}">
+                    {% if pair.win_rate >= 0 %}
+                        {{ "%.1f"|format(pair.win_rate) }}%
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+                <div class="ios-stat-label">Win Rate</div>
+            </div>
+            <div class="ios-stat-item">
+                <div class="ios-stat-value">{{ pair.wins }}-{{ pair.losses }}</div>
+                <div class="ios-stat-label">W-L</div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<a href="{{ url_for('add_pair') }}" class="ios-fab">+</a>
+{% endblock %} 
