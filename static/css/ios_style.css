@@ -40,8 +40,8 @@
     position: sticky;
     top: 0;
     background: rgba(240, 242, 245, 0.9);
-    padding: 15px;
-    z-index: 1000;
+    padding: 8px 15px;
+    z-index: 100;
     margin: -10px -10px 10px -10px;
     border-bottom: 1px solid #e5e5e5;
     display: flex;
@@ -49,6 +49,12 @@
     align-items: center;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+}
+
+.ios-header h1 {
+    font-size: 20px;
+    margin: 0;
+    line-height: 1.2;
 }
 
 .ios-stats {
@@ -185,12 +191,18 @@
     position: sticky;
     top: 0;
     background: rgba(240, 242, 245, 0.9);
-    padding: 15px;
+    padding: 8px 15px;
     z-index: 100;
     margin: -10px -10px 10px -10px;
     border-bottom: 1px solid #e5e5e5;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+}
+
+.header h1 {
+    font-size: 20px;
+    margin: 0;
+    line-height: 1.2;
 }
 
 .add-button {
