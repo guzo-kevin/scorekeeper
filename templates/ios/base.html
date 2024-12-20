@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ios_style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% block content %}{% endblock %}
+    
+    <nav class="ios-nav">
+        <a href="{{ url_for('players') }}" class="ios-nav-item {% if request.endpoint == 'players' %}active{% endif %}">
+            <div class="ios-nav-icon">👥</div>
+            <div>Players</div>
+        </a>
+        <a href="{{ url_for('pairs') }}" class="ios-nav-item {% if request.endpoint == 'pairs' %}active{% endif %}">
+            <div class="ios-nav-icon">👥👥</div>
+            <div>Pairs</div>
+        </a>
+        <a href="{{ url_for('double_matches') }}" class="ios-nav-item {% if request.endpoint == 'double_matches' %}active{% endif %}">
+            <div class="ios-nav-icon">🏸</div>
+            <div>Matches</div>
+        </a>
+        <a href="{{ url_for('admin') }}" class="ios-nav-item {% if request.endpoint == 'admin' %}active{% endif %}">
+            <div class="ios-nav-icon">⚙️</div>
+            <div>Admin</div>
+        </a>
+    </nav>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

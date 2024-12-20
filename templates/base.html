@@ -2,7 +2,11 @@
 <html>
 <head>
     <title>Badminton For Fun(d)</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% if is_ios() %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='ios_style.css') }}">
+    {% else %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% endif %}
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>

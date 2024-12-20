@@ -1,0 +1,73 @@
+{% extends "ios/base.html" %}
+
+{% block title %}Players{% endblock %}
+
+{% block content %}
+    <div class="header">
+        <h1>Players</h1>
+    </div>
+
+    <div class="player-list">
+        {% for player in players %}
+        <div class="player-card">
+            <div class="player-name">{{ player.name }}</div>
+            
+            <div class="present-toggle">
+                <label class="toggle-switch">
+                    <input type="checkbox" 
+                           {% if player.is_active %}checked{% endif %}
+                           onchange="togglePlayerStatus({{ player.id }}, this)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="player-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ "%.0f"|format(player.elo_rating) }}</div>
+                    <div class="stat-label">ELO</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value {% if player.win_rate >= 50 %}win-rate-good{% else %}win-rate-bad{% endif %}">
+                        {% if player.win_rate >= 0 %}
+                            {{ "%.1f"|format(player.win_rate) }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ player.wins }}-{{ player.losses }}</div>
+                    <div class="stat-label">W-L</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <a href="{{ url_for('add_player') }}" class="add-button">+</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function togglePlayerStatus(playerId, checkbox) {
+        fetch(`/toggle_player_status/${playerId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 'success') {
+                checkbox.checked = !checkbox.checked;
+                alert('Failed to update status');
+            }
+        })
+        .catch(error => {
+            checkbox.checked = !checkbox.checked;
+            alert('Error updating status');
+        });
+    }
+</script>
+{% endblock %}

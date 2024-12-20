@@ -1,0 +1,43 @@
+{% extends "ios/base.html" %}
+
+{% block title %}Add Match{% endblock %}
+
+{% block content %}
+<div class="ios-header">
+    <a href="{{ url_for('double_matches') }}" class="ios-back-button">Back</a>
+    <h1>Add Match</h1>
+    <div style="width: 50px"></div>
+</div>
+
+<form method="POST" class="ios-form">
+    <div>
+        <label for="team1_pair">Team 1</label>
+        <select id="team1_pair" name="team1_pair" required>
+            {% for pair in pairs %}
+            <option value="{{ pair.id }}">{{ pair.player1.name }} / {{ pair.player2.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div>
+        <label for="team1_score">Team 1 Score</label>
+        <input type="number" id="team1_score" name="team1_score" required min="0">
+    </div>
+    
+    <div>
+        <label for="team2_pair">Team 2</label>
+        <select id="team2_pair" name="team2_pair" required>
+            {% for pair in pairs %}
+            <option value="{{ pair.id }}">{{ pair.player1.name }} / {{ pair.player2.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div>
+        <label for="team2_score">Team 2 Score</label>
+        <input type="number" id="team2_score" name="team2_score" required min="0">
+    </div>
+    
+    <button type="submit" class="btn">Record Match</button>
+</form>
+{% endblock %} 
