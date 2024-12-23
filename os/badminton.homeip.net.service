@@ -1,0 +1,16 @@
+#copy to /etc/systemd/system/badminton_homeip_net.service
+#systemctl enable badminton_homeip_net.service
+#syetemctl start badminton_homeip_net.service
+[Unit]
+Description=Gunicorn instance to serve badminton.homeip.net
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/home/www-data/badminton
+ExecStart=/home/kzou/anaconda3/envs/web/bin/gunicorn --workers 2 --bind unix:/home/www-data/badminton/badminton.homeip.net.sock wsgi:app
+
+[Install]
+WantedBy=multi-user.target
+
